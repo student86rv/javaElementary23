@@ -46,7 +46,7 @@ private SessionFactory sessionFactory;
     public void removeUserByName(String name) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            String hql = String.format("DELETE FROM %s WHERE name = %s", User.class.getSimpleName(), name);
+            String hql = String.format("DELETE FROM %s WHERE name = ('%s')", User.class.getSimpleName(), name);
             Query query = session.createQuery(hql);
             query.executeUpdate();
             transaction.commit();
@@ -75,20 +75,16 @@ private SessionFactory sessionFactory;
     public User getUser(int id) {
         try (Session session = sessionFactory.openSession()) {
             return session
-                    .createQuery("FROM User WHERE _id = :i ", User.class)
-                    .setParameter("i", id)
+                    .createQuery("FROM User WHERE _id = :id ", User.class)
+                    .setParameter("id", id)
                     .getSingleResult();
         }
-//        return session
-//                .createQuery("FROM Student WHERE name = :name ", Student.class)
-//                .setParameter("name", name)
-//                .getSingleResult();
     }
 
     @Override
     public List<User> getAllUsers() {
         try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("FROM User", User.class).list();
+            return session.createQuery("FROM User ORDER BY _id", User.class).list();
         }
     }
 }
